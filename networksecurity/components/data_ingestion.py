@@ -3,6 +3,7 @@ from networksecurity.logging_utils.logger import logging
 
 ## Configuration of the data ingestion
 from networksecurity.entity.config_entity import DataIngestionCongif
+from networksecurity.entity.artifact_entity import DataIngestionArtifact
 import os
 import sys
 import numpy as np
@@ -34,7 +35,7 @@ class DataIngestion:
 
             df=pd.DataFrame(list(collection.find()))
             if "_id" in df.columns.to_list():
-                df=df.drop(columns=["_id"],axis=)
+                df=df.drop(columns=["_id"],axis=1)
             df.replace({"na":np.nan},inplace=True)
             return df
         except Exception as e:
@@ -70,6 +71,10 @@ class DataIngestion:
             dataframe= self.export_collection_as_dataframe()
             dataframe= self.export_data_into_feature_store(dataframe)
             self.split_data_as_train_test_test(dataframe)
+
+            dataingestionartifact=DataIngestionArtifact(trained_file_path=self.data_ingestion_config.training_file_path,
+                                                        test_file_path=self.data_ingestion_config.testing_file_path)
+            return dataingestionartifact
         except Exception as e:
             raise NetworkSecurityException(e, sys)
         
